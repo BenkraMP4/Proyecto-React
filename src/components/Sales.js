@@ -20,6 +20,12 @@ class Sales extends React.Component{
             total: 0
         },
         cart: [],
+        resumen : {
+            neto: 0,
+            taxs: 0,
+            otherTaxs: 0,
+            final: 0,
+        }
     }
 
     selectProduct = (event) => {
@@ -48,7 +54,44 @@ class Sales extends React.Component{
             this.setState({
                 cart: [...this.state.cart, cartRow]
             });
+            this.getResumen();
         }
+    }
+
+    removeCartItem = (item) => {
+        let cart = this.state.cart;
+        let index = cart.indexOf(item);
+        cart.splice(index, 1);
+        this.setState({
+            cart: cart
+        });
+        this.getResumen();
+
+    }
+
+    getResumen = () => {
+        setTimeout(() => {
+            let cart = this.state.cart;
+            var res = {
+                neto: 0,
+                taxs: 0,
+                otherTaxs: 0,
+                final: 0,
+            }
+            cart.forEach(item => {
+                res.neto += item.total;
+
+            });
+            res.taxs = res.neto * 0.19;
+            res.otherTaxs = 0;
+            res.final = res.neto + res.taxs + res.otherTaxs;
+            console.log(res);
+            this.setState({
+                resumen: res
+            });
+
+
+        }, 200)
     }
 
     componentDidMount() {
@@ -206,7 +249,7 @@ class Sales extends React.Component{
                                                     <td>{cl.productName}</td>
                                                     <td>{cl.qty}</td>
                                                     <td>{cl.total}</td>
-                                                    <td><button className="btn btn-danger"><i className="fas fa-trash"></i></button></td>
+                                                    <td><button className="btn btn-danger" onClick={this.removeCartItem.bind(cl)}><i className="fas fa-trash"></i></button></td>
                                                 </tr>
 
                                             ))}   
@@ -215,19 +258,19 @@ class Sales extends React.Component{
                                 </div>
                                 <div className="col-6">
                                     <label className="control-label">Neto</label>
-                                    <input className="form-control" type="text" name="neto" id="neto" readOnly="readonly" value="0" />
+                                    <input className="form-control" type="text" name="neto" id="neto" readOnly={true} value={this.state.resumen.neto} />
                                 </div>
                                 <div className="col-6">
                                     <label className="control-label">IVA</label>
-                                    <input className="form-control" type="text" name="tax" id="tax" readOnly="readonly" value="0" />
+                                    <input className="form-control" type="text" name="tax" id="tax" readOnly={true} value={this.state.resumen.taxs} />
                                 </div>
                                 <div className="col-6">
                                     <label className="control-label">Otros Impuestos</label>
-                                    <input className="form-control" type="text" name="otherTaxs" id="otherTaxs" readOnly="readonly" value="0" />
+                                    <input className="form-control" type="text" name="otherTaxs" id="otherTaxs" readOnly={true} value={this.state.resumen.otherTaxs} />
                                 </div>
                                 <div className="col-6">
                                     <label className="control-label">Total</label>
-                                    <input className="form-control" type="text" name="final" id="final" readOnly="readonly" value="0" />
+                                    <input className="form-control" type="text" name="final" id="final" readOnly={true} value={this.state.resumen.final} />
                                 </div>
                                 <div className="col-12">
                                     <hr />
